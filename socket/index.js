@@ -18,19 +18,17 @@ io.on("connection", (socket) => {
       io.emit("getOnlineUsers", onlineUser);
     });
   
-    // Sự kiện gửi tin nhắn
-    // socket.on("sendMessage", (message) => {
-    //   const user = onlineUser.find((user) => user.userId == message.recipientId);
-      
-    //   if (user) {
-    //     io.to(user.socketId).emit("getMessage", message);
-    //   }
-    // });
+   // gui tin nhan
     socket.on("sendMessage", (message) => {
         const user = onlineUser.find((user) => user.userId == message.recipientId);
         
         if (user) {
           io.to(user.socketId).emit("getMessage", message);
+          io.to(user.socketId).emit("getNotification", {
+            senderId:message.senderId,
+            isRead:false,
+            date: new Date()
+          });
         }
       });
     socket.on("disconnect", () => {

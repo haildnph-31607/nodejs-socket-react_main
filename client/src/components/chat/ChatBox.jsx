@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../../Context/AuthContext";
 import { ChatContext } from "../../Context/ChatContext";
 import { userFetchRecipient } from "../../hooks/userFetchRecipient";
@@ -8,11 +8,16 @@ import InputEmoji from "react-input-emoji";
 
 const ChatBox = () => {
   const { user } = useContext(AuthContext);
-  const { currentChats, isMessageLoading, message,sendMessage } = useContext(ChatContext);
+  const { currentChats, isMessageLoading, message, sendMessage } =
+    useContext(ChatContext);
   const { recipientUser } = userFetchRecipient(currentChats, user);
   const [textMessage, setTextMessage] = useState("");
-  console.log(textMessage);
+  const scroll = useRef();
 
+
+  useEffect(() => {
+    scroll.current?.scrollIntoView({ behavior: "smooth" });
+  }, [message]);
   if (!recipientUser)
     return (
       <p style={{ textAlign: "center", width: "100%" }}>
@@ -40,6 +45,7 @@ const ChatBox = () => {
                   ? "message self align-self-end flex-grow-0"
                   : "message align-self-start flex-grow-0"
               }`}
+              ref={scroll}
             >
               <span>{mes.text}</span>
               <span className="message-footer">
@@ -55,7 +61,12 @@ const ChatBox = () => {
           fontFamily="nunito"
           borderColor="rgba(72,112,223,0.2)"
         />
-        <button className="send-btn" onClick={()=>sendMessage(textMessage,user,currentChats._id,setTextMessage)}>
+        <button
+          className="send-btn"
+          onClick={() =>
+            sendMessage(textMessage, user, currentChats._id, setTextMessage)
+          }
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"

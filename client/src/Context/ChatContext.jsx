@@ -17,8 +17,10 @@ export const ChatContextProvider = ({ children, user }) => {
   const [newMessage, setNewMessage] = useState(null);
   const [socket, setSocket] = useState(null);
   const [onlineUser, setOnlineUser] = useState(null);
+  const [notification, setNotification] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
 
-  console.log("online", onlineUser);
+  console.log("notification", notification);
 
   //setting socket.io
   useEffect(() => {
@@ -43,12 +45,10 @@ export const ChatContextProvider = ({ children, user }) => {
   useEffect(() => {
     if (!socket) return;
     const recipientId = currentChats?.members?.find((id) => id !== user?._id);
-   
-    
-     socket.emit("sendMessage", { ...newMessage, recipientId });
 
+    socket.emit("sendMessage", { ...newMessage, recipientId });
   }, [newMessage]);
-  //get message client
+  //get message client & notification
   useEffect(() => {
     if (!socket) return;
     socket.on("getMessage", (res) => {
@@ -57,8 +57,20 @@ export const ChatContextProvider = ({ children, user }) => {
       if (currentChats?._id !== res.chatId) return;
       setMessage((prev) => [...prev, res]);
     });
+    socket.on("getNotification", (res) => {
+  
+      
+      const isChatOpen = currentChats?.members.some((id) => id === res.senderId);
+      
+      if (isChatOpen) {
+        setNotification((prev) => [{ ...res, isRead: true }, ...prev]);
+      } else {
+        setNotification((prev) => [...prev,{ ...res, isRead: false } ]);
+      }
+    });
     return () => {
       socket.off("getMessage");
+      socket.off("getNotification");
     };
   }, [newMessage, currentChats]);
   //getall -me+userchat
@@ -79,6 +91,7 @@ export const ChatContextProvider = ({ children, user }) => {
         return !isChatCreate;
       });
       setPotentialChats(pChats);
+      setAllUsers(response)
     })();
   }, [userChats]);
   //get chat room
@@ -177,6 +190,7 @@ export const ChatContextProvider = ({ children, user }) => {
         currentChats,
         sendMessage,
         onlineUser,
+        notification,allUsers
       }}
     >
       {children}
