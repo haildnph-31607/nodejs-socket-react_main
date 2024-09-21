@@ -113,7 +113,7 @@ export const ChatContextProvider = ({ children, user }) => {
       }
     };
     getUserChat();
-  }, [user]);
+  }, [user,notification]);
   //   click create chat new
   const createChat = useCallback(async (firstId, seconId) => {
     const response = await postRequest(
@@ -201,6 +201,20 @@ export const ChatContextProvider = ({ children, user }) => {
     },
     []
   );
+  const markThisUserNotifications = useCallback((thisUserNotification,notification)=>{
+   const mNotification = notification.map((el)=>{
+    let notifications ;
+    thisUserNotification.forEach(n=>{
+      if(n.senderId === el.senderId){
+        notifications= {...n,isRead:true}
+      }else{
+        notification = el
+      }
+    })
+    return notifications
+   })
+   setNotification(mNotification)
+  },[])
   return (
     <ChatContext.Provider
       value={{
@@ -219,7 +233,9 @@ export const ChatContextProvider = ({ children, user }) => {
         notification,
         allUsers,
         maskAllNotificationAsRead,
-        markNotificationAsRead
+        markNotificationAsRead,
+        markThisUserNotifications,
+        newMessage
       }}
     >
       {children}

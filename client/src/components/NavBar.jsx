@@ -3,6 +3,7 @@ import { Container, Nav, Navbar, Stack } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../Context/AuthContext";
 import Notification from "./chat/Notification";
+import messIcon from '../assets/messicon.webp'
 
 const NavBar = () => {
   const { user, logoutUser } = useContext(AuthContext);
@@ -12,7 +13,7 @@ const NavBar = () => {
       <Container>
         <h2>
           <Link to="/" className="link-light text-decoration-none">
-            Chat App
+            <img src={messIcon} alt="" width={'50px'} /> <span>Messenger</span>
           </Link>
         </h2>
         {user ? (
